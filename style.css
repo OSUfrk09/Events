@@ -3,6 +3,7 @@ body {
     margin: 20px;
     background-color: #f4f4f4;
 }
+
 .event-item {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -10,31 +11,27 @@ body {
     margin-bottom: 10px;
     border-radius: 5px;
 }
+
 .event-item h3 {
     color: #333;
     margin-top: 0;
 }
-.event-time {
-    font-size: 0.9em;
-    color: #555;
-}
-.event-location {
-    font-style: italic;
-    color: #777;
-}
-/* ... (existing styles) ... */
 
+/* Styles for the formatted date (e.g., "Jul 9") */
 .event-date {
     font-weight: bold;
     color: #007bff; /* Example: a blue color for the date */
     margin-bottom: 5px; /* Add some space below the date */
 }
 
-.event-time-start,
-.event-time-end {
+/* Styles for the combined time range (e.g., "4:30 PM - 5:30 PM") */
+.event-time {
     font-size: 0.9em;
     color: #333;
-    line-height: 1.2; /* Adjust line spacing if needed */
+    line-height: 1.2;
 }
 
-/* Add more styles here to customize the appearance */
+.event-location {
+    font-style: italic;
+    color: #777;
+}
