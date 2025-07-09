@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const eventListContainer = document.getElementById('event-list-container');
-    const API_URL = 'http://OSUfrk09.pythonanywhere.com/events'; // **REPLACE WITH YOUR ACTUAL PYTHONANYWHERE URL**
+    const API_URL = 'https://OSUfrk09.pythonanywhere.com/events'; // **REPLACE WITH YOUR ACTUAL PYTHONANYWHERE URL**
 
     fetch(API_URL)
         .then(response => {
