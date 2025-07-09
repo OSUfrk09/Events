@@ -35,3 +35,14 @@ body {
     font-style: italic;
     color: #777;
 }
+
+/* New styles for the "Signup Available" text */
+.event-signup {
+    font-weight: bold;
+    color: green; /* Make the text green */
+    background-color: #e6ffe6; /* Light green background */
+    padding: 5px 8px; /* Some padding around the text */
+    border-radius: 3px; /* Slightly rounded corners */
+    display: inline-block; /* Make it behave like a block element, but only take necessary width */
+    margin-top: 5px; /* Add some space above it */
+}
