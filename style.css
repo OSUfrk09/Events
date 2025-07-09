@@ -22,4 +22,19 @@ body {
     font-style: italic;
     color: #777;
 }
+/* ... (existing styles) ... */
+
+.event-date {
+    font-weight: bold;
+    color: #007bff; /* Example: a blue color for the date */
+    margin-bottom: 5px; /* Add some space below the date */
+}
+
+.event-time-start,
+.event-time-end {
+    font-size: 0.9em;
+    color: #333;
+    line-height: 1.2; /* Adjust line spacing if needed */
+}
+
 /* Add more styles here to customize the appearance */
