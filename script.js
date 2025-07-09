@@ -16,21 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     const startDate = new Date(event.starts_at);
                     const endDate = new Date(event.ends_at);
 
-                    // Add date validation
                     const isValidStartDate = !isNaN(startDate.getTime());
                     const isValidEndDate = !isNaN(endDate.getTime());
 
                     let formattedDate = 'N/A Date';
-                    let formattedStartTime = 'N/A Start Time';
-                    let formattedEndTime = 'N/A End Time';
+                    let timeRange = 'N/A Time';
 
                     if (isValidStartDate) {
-                         formattedDate = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short' }).format(startDate);
-                         formattedStartTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(startDate);
-                    }
+                        formattedDate = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short' }).format(startDate);
+                        const formattedStartTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(startDate);
 
-                    if (isValidEndDate) {
-                        formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                        if (isValidEndDate) {
+                            const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                            timeRange = `${formattedStartTime} - ${formattedEndTime}`; // Combine start and end time with a dash
+                        } else {
+                            timeRange = `Starts: ${formattedStartTime}`; // Display only start time if end time is invalid
+                        }
+                    } else if (isValidEndDate) {
+                        const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                        timeRange = `Ends: ${formattedEndTime}`; // Display only end time if start time is invalid
                     }
 
                     const eventDiv = document.createElement('div');
@@ -38,8 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     eventDiv.innerHTML = `
                         <h3>${event.name}</h3>
                         <p class='event-date'>${formattedDate}</p>
-                        <p class='event-time-start'>Starts: ${formattedStartTime}</p>
-                        <p class='event-time-end'>Ends: ${formattedEndTime}</p>
+                        <p class='event-time'>${timeRange}</p> <!-- Display the combined time range -->
                         <p class='event-location'>Location: ${event.location}</p>
                     `;
                     eventListContainer.appendChild(eventDiv);
