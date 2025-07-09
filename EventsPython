@@ -1,0 +1,133 @@
+import requests
+import base64
+import json
+from datetime import datetime
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+APPLICATION_ID = "bb44967fb1b7c92f516d89b6c252246a9d15718f42dde1b3fad8c10780ca7bfe"
+SECRET = "pco_pat_97acfd8eb95702d707f173d8b1ff4008b54b15325d1989f79ae73e51ff42c5037f1aa075" 
+
+BASE_URL = "https://api.planningcenteronline.com/calendar/v2"
+
+TAG_NAME_TO_FILTER = "Save The Date" 
+
+def get_tag_id_by_name(tag_name):
+    """Fetches the primary ID of a tag by its name."""
+    url = f"{BASE_URL}/tags"
+
+    auth_string = f"{APPLICATION_ID}:{SECRET}".encode()
+    encoded_auth_string = base64.b64encode(auth_string).decode()
+    headers = {"Authorization": f"Basic {encoded_auth_string}"}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        tags_data = response.json()
+
+        if tags_data.get("data"):
+            for tag in tags_data["data"]:
+                tag_attributes = tag.get("attributes", {})
+                if tag_attributes.get("name") == tag_name:
+                    return tag.get("id")
+
+        print(f"Tag '{tag_name}' not found.")
+        return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching tags: {e}")
+        return None
+    except Exception as e:
+        print(f"An unexpected error occurred in get_tag_id_by_name: {e}")
+        return None
+
+def get_first_page_event_instances(tag_id):
+    """
+    Fetches the first page of upcoming event instances filtered by tag_id.
+    Note: This will only retrieve the first page of results, typically 25 or 100 items.
+    """
+    all_filtered_event_instances = []
+    url = f"{BASE_URL}/event_instances"
+    
+    params = {
+        "filter": "future",
+        "include": "tags",
+        "where[tag_ids]": tag_id,
+    }
+
+    auth_string = f"{APPLICATION_ID}:{SECRET}".encode()
+    encoded_auth_string = base64.b64encode(auth_string).decode()
+    headers = {"Authorization": f"Basic {encoded_auth_string}"}
+
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+
+        event_instances_data = response.json()
+
+        if not event_instances_data.get("data"):
+            return []
+        
+        all_filtered_event_instances = event_instances_data.get("data", [])
+        
+        return all_filtered_event_instances
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching event instances: {e}")
+        return []
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return []
+
+def format_event_data(event_instance):
+    """Helper function to format a single event instance into a dictionary."""
+    instance_attributes = event_instance.get("attributes", {})
+
+    name = instance_attributes.get("name", "N/A Event Name")
+    starts_at_raw = instance_attributes.get("starts_at") 
+    ends_at_raw = instance_attributes.get("ends_at")
+    location_name = instance_attributes.get("location", "N/A Location Name")
+
+    starts_at_formatted = "N/A"
+    if starts_at_raw:
+        try:
+            starts_at_parsed = datetime.fromisoformat(starts_at_raw.replace('Z', '+00:00'))
+            starts_at_formatted = starts_at_parsed.strftime('%Y-%m-%d %I:%M %p')
+        except ValueError:
+            starts_at_formatted = f"Invalid start time format: {starts_at_raw}"
+
+    ends_at_formatted = "N/A"
+    if ends_at_raw:
+        try:
+            ends_at_parsed = datetime.fromisoformat(ends_at_raw.replace('Z', '+00:00'))
+            ends_at_formatted = ends_at_parsed.strftime('%Y-%m-%d %I:%M %p')
+        except ValueError:
+            ends_at_formatted = f"Invalid end time format: {ends_at_raw}"
+
+    return {
+        "name": name,
+        "starts_at": starts_at_formatted,
+        "ends_at": ends_at_formatted,
+        "location": location_name,
+        # You can add other attributes here if needed
+    }
+
+@app.route("/events")
+def get_events_json():
+    """API endpoint to return event data as JSON."""
+    tag_primary_id = get_tag_id_by_name(TAG_NAME_TO_FILTER)
+
+    if tag_primary_id:
+        event_instances = get_first_page_event_instances(tag_primary_id)
+        formatted_events = [format_event_data(e) for e in event_instances]
+        return jsonify(formatted_events)
+    else:
+        # Return an error or empty list if tag is not found
+        return jsonify({"error": f"Tag '{TAG_NAME_TO_FILTER}' not found."}), 404
+
+if __name__ == "__main__":
+    # This part runs the Flask app for local testing only.
+    # PythonAnywhere's WSGI server will handle running the app in production.
+    app.run(debug=True)
