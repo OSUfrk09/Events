@@ -28,22 +28,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if (isValidEndDate) {
                             const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
-                            timeRange = `${formattedStartTime} - ${formattedEndTime}`; // Combine start and end time with a dash
+                            timeRange = `${formattedStartTime} - ${formattedEndTime}`;
                         } else {
-                            timeRange = `Starts: ${formattedStartTime}`; // Display only start time if end time is invalid
+                            timeRange = `Starts: ${formattedStartTime}`;
                         }
                     } else if (isValidEndDate) {
                         const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
-                        timeRange = `Ends: ${formattedEndTime}`; // Display only end time if start time is invalid
+                        timeRange = `Ends: ${formattedEndTime}`;
                     }
+
+                    // --- Updated code to display signup status ---
+                    let signupStatus = '';
+                    // Check if event.registration_url exists and is not null or an empty string
+                    if (event.registration_url && event.registration_url.trim() !== '') { 
+                        signupStatus = `<p class='event-signup'>Signup Available</p>`;
+                    }
+                    // --- End updated code ---
 
                     const eventDiv = document.createElement('div');
                     eventDiv.className = 'event-item';
                     eventDiv.innerHTML = `
                         <h3>${event.name}</h3>
                         <p class='event-date'>${formattedDate}</p>
-                        <p class='event-time'>${timeRange}</p> <!-- Display the combined time range -->
+                        <p class='event-time'>${timeRange}</p>
                         <p class='event-location'>Location: ${event.location}</p>
+                        ${signupStatus} <!-- Add the signup status here -->
                     `;
                     eventListContainer.appendChild(eventDiv);
                 });
