@@ -13,16 +13,25 @@ document.addEventListener('DOMContentLoaded', () => {
             eventListContainer.innerHTML = ''; // Clear the loading message
             if (events.length > 0) {
                 events.forEach(event => {
-                    // Create Date objects from the ISO strings returned by your API
                     const startDate = new Date(event.starts_at);
                     const endDate = new Date(event.ends_at);
 
-                    // Format Day and Month (e.g., "Jul 9")
-                    const formattedDate = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short' }).format(startDate);
+                    // Add date validation
+                    const isValidStartDate = !isNaN(startDate.getTime());
+                    const isValidEndDate = !isNaN(endDate.getTime());
 
-                    // Format Time (e.g., "04:30 PM")
-                    const formattedStartTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(startDate);
-                    const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                    let formattedDate = 'N/A Date';
+                    let formattedStartTime = 'N/A Start Time';
+                    let formattedEndTime = 'N/A End Time';
+
+                    if (isValidStartDate) {
+                         formattedDate = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short' }).format(startDate);
+                         formattedStartTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(startDate);
+                    }
+
+                    if (isValidEndDate) {
+                        formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                    }
 
                     const eventDiv = document.createElement('div');
                     eventDiv.className = 'event-item';
