@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const eventsContainer = document.getElementById('events-container');
 
-    // Replace with your actual PythonAnywhere domain for the Flask backend
-    // Example: const API_URL = 'https://yourusername.pythonanywhere.com/events';
-    const API_URL = 'YOUR_PYTHONANYWHERE_FLASK_APP_URL/events'; // <<-- Remember to change this!
+    // Updated with your specified PythonAnywhere Flask app URL
+    const BASE_API_URL = 'https://OSUfrk09.pythonanywhere.com/events';
+
+    // Add a cache-busting timestamp to the URL
+    const API_URL = `${BASE_API_URL}?_t=${new Date().getTime()}`; // Appends a unique timestamp
 
     fetch(API_URL)
         .then(response => {
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h4>${event.name}</h4>
                         <p><strong>Starts:</strong> ${startDateFormatted}</p>
                         <p><strong>Ends:</strong> ${endDateFormatted}</p>
-                        <p>${event.location}</p> <!-- Removed '<strong>Location:</strong> ' label -->
+                        <p>${event.location}</p>
                         ${event.registration_url ? `<p><a href="${event.registration_url}" target="_blank">Register Here</a></p>` : ''}
                     `;
                     eventsContainer.appendChild(eventElement);
