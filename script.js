@@ -43,13 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         timeRange = `Ends: ${formattedEndTime}`;
                     }
 
-                    // --- Updated code to display signup status ---
                     let signupStatus = '';
-                    // Check if event.registration_url exists and is not null or an empty string
                     if (event.registration_url && event.registration_url.trim() !== '') {
                         signupStatus = `<p class='event-signup'>Signup Available</p>`;
                     }
-                    // --- End updated code ---
 
                     const eventDiv = document.createElement('div');
                     eventDiv.className = 'event-item';
@@ -57,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3>${event.name}</h3>
                         <p class='event-date'>${formattedDate}</p>
                         <p class='event-time'>${timeRange}</p>
-                        <p class='event-location'>Location: ${event.location}</p>
-                        ${signupStatus} <!-- Add the signup status here -->
+                        <p class='event-location'>${event.location}</p> <!-- ONLY THIS LINE WAS CHANGED -->
+                        ${signupStatus}
                     `;
                     eventListContainer.appendChild(eventDiv);
                 });
