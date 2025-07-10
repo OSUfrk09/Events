@@ -4,45 +4,107 @@ body {
     background-color: #f4f4f4;
 }
 
-.event-item {
+h1 {
+    color: #0056b3;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#featured-events-container,
+#event-list-container {
     background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
-.event-item h3 {
-    color: #333;
-    margin-top: 0;
+/* Styling for individual event items - now a flex container */
+.event-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    display: flex; /* Make it a flex container */
+    align-items: flex-start; /* Align items to the top of the container */
+    gap: 15px; /* Space between the date box and info box */
 }
 
-/* Styles for the formatted date (e.g., "Jul 9") */
-.event-date {
+.event-item:last-child {
+    border-bottom: none;
+}
+
+/* New styling for the date box */
+.event-date-box {
+    flex-shrink: 0; /* Prevent it from shrinking */
+    width: 60px; /* Fixed width for the date box */
+    height: 60px; /* Fixed height for the date box (to make it a square/circular if desired) */
+    background-color: #007bff; /* Background color for the date box */
+    color: #fff; /* Text color for the date */
+    border-radius: 8px; /* Rounded corners for the box */
+    display: flex; /* Use flexbox to center the content inside */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    font-size: 1.1em; /* Larger font size for the date */
     font-weight: bold;
-    color: #007bff; /* Example: a blue color for the date */
-    margin-bottom: 5px; /* Add some space below the date */
+    text-align: center; /* Ensure text alignment, although flex centering also works */
 }
 
-/* Styles for the combined time range (e.g., "4:30 PM - 5:30 PM") */
+/* Styling for the content inside the date box */
+.event-date-box p {
+    margin: 0; /* Remove default paragraph margins */
+    line-height: 1; /* Adjust line height to prevent extra spacing */
+}
+
+/* Styling for the info box (rest of the event details) */
+.event-info-box {
+    flex-grow: 1; /* Allow it to take up remaining space */
+}
+
+/* Event Title */
+.event-item h3 {
+    color: #007bff;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+/* Event Date (moved inside .event-date-box) */
+/* .event-date {
+    // These styles are now handled by .event-date-box p
+} */
+
+/* Event Time */
 .event-time {
     font-size: 0.9em;
     color: #333;
     line-height: 1.2;
 }
 
+/* Event Location */
 .event-location {
     font-style: italic;
     color: #777;
+    margin-top: 5px; /* Add some spacing */
 }
 
-/* New styles for the "Signup Available" text */
+/* Signup Status */
 .event-signup {
     font-weight: bold;
-    color: green; /* Make the text green */
-    background-color: #e6ffe6; /* Light green background */
-    padding: 5px 8px; /* Some padding around the text */
-    border-radius: 3px; /* Slightly rounded corners */
-    display: inline-block; /* Make it behave like a block element, but only take necessary width */
-    margin-top: 5px; /* Add some space above it */
+    color: green;
+    background-color: #e6ffe6;
+    padding: 5px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top: 5px;
+    align-self: flex-start;
+}
+
+/* Basic Link Styling for Register Here */
+.event-item a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.event-item a:hover {
+    text-decoration: underline;
 }
