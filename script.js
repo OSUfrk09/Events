@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsContainer = document.getElementById('featured-events-container');
-    const upcomingEventsContainer = document.getElementById('event-list-container'); // Renamed for clarity
+    const upcomingEventsContainer = document.getElementById('event-list-container');
 
     const API_URL = 'https://osufrk09.pythonanywhere.com/events';
 
-    // Helper function to render a list of events into a container
     const renderEvents = (container, eventsToRender, isFeaturedSection = false) => {
         if (!container) {
             console.error(`Error: Element not found: ${isFeaturedSection ? 'featured-events-container' : 'event-list-container'}`);
@@ -46,13 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event-item';
+
+                // --- MODIFIED HTML STRUCTURE HERE ---
                 eventDiv.innerHTML = `
-                    <h3>${event.name}</h3>
-                    <p class='event-date'>${formattedDate}</p>
-                    <p class='event-time'>${timeRange}</p>
-                    <p class='event-location'>${event.location}</p>
-                    ${signupStatus}
+                    <div class="event-date-box">
+                        <p>${formattedDate}</p>
+                    </div>
+                    <div class="event-info-box">
+                        <h3>${event.name}</h3>
+                        <p class='event-time'>${timeRange}</p>
+                        <p class='event-location'>${event.location}</p>
+                        ${signupStatus}
+                    </div>
                 `;
+                // --- END MODIFIED HTML STRUCTURE ---
+
                 container.appendChild(eventDiv);
             });
         } else {
@@ -68,11 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(events => {
-            // Filter events into featured and non-featured
-            const featuredEvents = events.filter(event => event.featured === true); // Assuming 'featured' attribute exists and is boolean
+            const featuredEvents = events.filter(event => event.featured === true);
             const upcomingEvents = events.filter(event => event.featured !== true);
 
-            // Render events into their respective sections
             renderEvents(featuredEventsContainer, featuredEvents, true);
             renderEvents(upcomingEventsContainer, upcomingEvents);
         })
