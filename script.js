@@ -10,7 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(events => {
-            eventListContainer.innerHTML = ''; // Clear the loading message
+            if (eventListContainer) { // Defensive check
+                eventListContainer.innerHTML = ''; // Clear the loading message
+            } else {
+                console.error("Error: 'event-list-container' element not found after fetch success.");
+                return; // Stop if container not found
+            }
+
             if (events.length > 0) {
                 events.forEach(event => {
                     const startDate = new Date(event.starts_at);
@@ -40,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // --- Updated code to display signup status ---
                     let signupStatus = '';
                     // Check if event.registration_url exists and is not null or an empty string
-                    if (event.registration_url && event.registration_url.trim() !== '') { 
+                    if (event.registration_url && event.registration_url.trim() !== '') {
                         signupStatus = `<p class='event-signup'>Signup Available</p>`;
                     }
                     // --- End updated code ---
@@ -62,6 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error fetching events:', error);
-            eventListContainer.innerHTML = '<p>Failed to load events. Please try again later.</p>';
+            if (eventListContainer) { // Defensive check
+                eventListContainer.innerHTML = '<p>Failed to load events. Please try again later.</p>';
+            } else {
+                console.error("Could not display error message: 'event-list-container' not found in catch block.");
+            }
         });
 });
