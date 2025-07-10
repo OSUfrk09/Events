@@ -1,8 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const eventsContainer = document.getElementById('event-list-container');
-
-    // Updated with your specified PythonAnywhere Flask app URL
-    const API_URL = 'https://OSUfrk09.pythonanywhere.com/events'; 
+document.addEventListener('DOMContentLoaded', () => {
+    const eventListContainer = document.getElementById('event-list-container');
+    const API_URL = 'https://osufrk09.pythonanywhere.com/events'; // Ensure this is the correct HTTPS URL
 
     fetch(API_URL)
         .then(response => {
@@ -12,68 +10,58 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(events => {
-            if (events.length === 0) {
-                // If eventsContainer is null, this will cause the TypeError.
-                // Consider adding a defensive check here, like:
-                // if (eventsContainer) { eventsContainer.innerHTML = '<p>No upcoming events found.</p>'; }
-                eventsContainer.innerHTML = '<p>No upcoming events found.</p>';
-                return;
-            }
+            eventListContainer.innerHTML = ''; // Clear the loading message
+            if (events.length > 0) {
+                events.forEach(event => {
+                    const startDate = new Date(event.starts_at);
+                    const endDate = new Date(event.ends_at);
 
-            // Group events by month for better display
-            const eventsByMonth = events.reduce((acc, event) => {
-                const startDate = new Date(event.starts_at);
-                const monthYear = startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-                if (!acc[monthYear]) {
-                    acc[monthYear] = [];
-                }
-                acc[monthYear].push(event);
-                return acc;
-            }, {});
+                    const isValidStartDate = !isNaN(startDate.getTime());
+                    const isValidEndDate = !isNaN(endDate.getTime());
 
-            for (const monthYear in eventsByMonth) {
-                // If eventsContainer is null, this will cause the TypeError.
-                // Consider adding a defensive check here, like:
-                // if (eventsContainer) {
-                //    const monthHeader = document.createElement('h3');
-                //    monthHeader.textContent = monthYear;
-                //    eventsContainer.appendChild(monthHeader);
-                // }
-                const monthHeader = document.createElement('h3');
-                monthHeader.textContent = monthYear;
-                eventsContainer.appendChild(monthHeader);
+                    let formattedDate = 'N/A Date';
+                    let timeRange = 'N/A Time';
 
-                eventsByMonth[monthYear].forEach(event => {
-                    const eventElement = document.createElement('div');
-                    eventElement.classList.add('event-card');
+                    if (isValidStartDate) {
+                        formattedDate = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short' }).format(startDate);
+                        const formattedStartTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(startDate);
 
-                    const startsAt = new Date(event.starts_at);
-                    const endsAt = new Date(event.ends_at);
+                        if (isValidEndDate) {
+                            const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                            timeRange = `${formattedStartTime} - ${formattedEndTime}`;
+                        } else {
+                            timeRange = `Starts: ${formattedStartTime}`;
+                        }
+                    } else if (isValidEndDate) {
+                        const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
+                        timeRange = `Ends: ${formattedEndTime}`;
+                    }
 
-                    const startDateFormatted = startsAt.toLocaleString('en-US', {
-                        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
-                    });
-                    const endDateFormatted = endsAt.toLocaleString('en-US', {
-                        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
-                    });
+                    // --- Updated code to display signup status ---
+                    let signupStatus = '';
+                    // Check if event.registration_url exists and is not null or an empty string
+                    if (event.registration_url && event.registration_url.trim() !== '') { 
+                        signupStatus = `<p class='event-signup'>Signup Available</p>`;
+                    }
+                    // --- End updated code ---
 
-                    eventElement.innerHTML = `
-                        <h4>${event.name}</h4>
-                        <p><strong>Starts:</strong> ${startDateFormatted}</p>
-                        <p><strong>Ends:</strong> ${endDateFormatted}</p>
-                        <p><strong>Location:</strong> ${event.location}</p>
-                        ${event.registration_url ? `<p><a href="${event.registration_url}" target="_blank">Register Here</a></p>` : ''}
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'event-item';
+                    eventDiv.innerHTML = `
+                        <h3>${event.name}</h3>
+                        <p class='event-date'>${formattedDate}</p>
+                        <p class='event-time'>${timeRange}</p>
+                        <p class='event-location'>Location: ${event.location}</p>
+                        ${signupStatus} <!-- Add the signup status here -->
                     `;
-                    // If eventsContainer is null, this will cause the TypeError.
-                    eventsContainer.appendChild(eventElement);
+                    eventListContainer.appendChild(eventDiv);
                 });
+            } else {
+                eventListContainer.innerHTML = '<p>No upcoming events found.</p>';
             }
         })
         .catch(error => {
             console.error('Error fetching events:', error);
-            // If eventsContainer is null, this will cause the TypeError.
-            // Consider adding a defensive check here, like:
-            // if (eventsContainer) { eventsContainer.innerHTML = `<p>Error loading events: ${error.message}. Please try again later.</p>`; }
-            eventsContainer.innerHTML = `<p>Error loading events: ${error.message}. Please try again later.</p>`;
+            eventListContainer.innerHTML = '<p>Failed to load events. Please try again later.</p>';
         });
 });
