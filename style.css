@@ -1,19 +1,19 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f4f4f4;
+    margin: 0px; /* Changed margin to 0 */
+    background-color: #2C2D2E; /* Changed background color to dark gray */
 }
 
 h1 {
-    color: #0056b3;
-    text-align: center;
-    margin-bottom: 30px;
+    color: #fff; /* Changed h1 color to white */
+    text-align: Left; /* Changed text alignment to left */
+    margin-bottom: 10px;
 }
 
 #featured-events-container,
 #event-list-container {
-    background-color: #fff;
-    padding: 20px;
+    background-color: #fff; /* Base background for the container */
+    padding: 0px; /* Changed padding to 0 */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -21,68 +21,83 @@ h1 {
 
 /* Styling for individual event items - now a flex container */
 .event-item {
-    border-bottom: 1px solid #eee;
-    padding: 15px 0;
-    display: flex; /* Make it a flex container */
-    align-items: flex-start; /* Align items to the top of the container */
-    gap: 15px; /* Space between the date box and info box */
+    border-bottom: 0px solid #eee; /* Changed border-bottom to 0 */
+    padding: 0px 0; /* Changed padding to 0 */
+    display: flex;
+    align-items: stretch; /* Ensures children stretch to fill height */
+    gap: 15px;
 }
 
 .event-item:last-child {
     border-bottom: none;
 }
 
+/* Alternating background colors for event items */
+#featured-events-container .event-item:nth-child(odd) {
+    background-color: #1565C0; /* Blue for odd rows */
+}
+
+#featured-events-container .event-item:nth-child(even) {
+    background-color: #0090DB; /* Darker blue for even rows */
+}
+
+#event-list-container .event-item:nth-child(odd) {
+    background-color: #1565C0; /* Blue for odd rows */
+}
+
+#event-list-container .event-item:nth-child(even) {
+    background-color: #0090DB; /* Darker blue for even rows */
+}
+
 /* New styling for the date box */
 .event-date-box {
-    flex-shrink: 0; /* Prevent it from shrinking */
-    width: 60px; /* Fixed width for the date box */
-    height: 60px; /* Fixed height for the date box (to make it a square/circular if desired) */
-    background-color: #007bff; /* Background color for the date box */
-    color: #fff; /* Text color for the date */
-    border-radius: 8px; /* Rounded corners for the box */
-    display: flex; /* Use flexbox to center the content inside */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    font-size: 1.1em; /* Larger font size for the date */
+    flex-shrink: 0;
+    width: 100px; /* Increased width to 100px */
+    background-color: #00D3AD; /* Changed background color to green */
+    color: #fff;
+    border-radius: 0px; /* Removed overall border-radius */
+    border-top-right-radius: 8px; /* Added specific border-radius */
+    border-bottom-right-radius: 8px; /* Added specific border-radius */
+    display: flex;
+    flex-direction: column; /* Ensure vertical centering even if content wraps */
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1em;
     font-weight: bold;
-    text-align: center; /* Ensure text alignment, although flex centering also works */
+    text-align: center;
+    border-bottom: 1px solid #000000; /* Added bottom border */
 }
 
 /* Styling for the content inside the date box */
 .event-date-box p {
-    margin: 0; /* Remove default paragraph margins */
-    line-height: 1; /* Adjust line height to prevent extra spacing */
+    margin: 0;
+    line-height: 1.2;
 }
 
 /* Styling for the info box (rest of the event details) */
 .event-info-box {
-    flex-grow: 1; /* Allow it to take up remaining space */
+    flex-grow: 1;
 }
 
 /* Event Title */
 .event-item h3 {
-    color: #007bff;
-    margin-top: 0;
+    color: #00D3AD; /* Changed h3 color to green */
+    margin-top: 10px; /* Changed margin-top to 10px */
     margin-bottom: 5px;
 }
-
-/* Event Date (moved inside .event-date-box) */
-/* .event-date {
-    // These styles are now handled by .event-date-box p
-} */
 
 /* Event Time */
 .event-time {
     font-size: 0.9em;
-    color: #333;
+    color: #fff; /* Changed text color to white */
     line-height: 1.2;
 }
 
 /* Event Location */
 .event-location {
     font-style: italic;
-    color: #777;
-    margin-top: 5px; /* Add some spacing */
+    color: #fff; /* Changed text color to white */
+    margin-top: 5px;
 }
 
 /* Signup Status */
