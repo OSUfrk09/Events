@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const eventsContainer = document.getElementById('event-list-container');
 
-    // Updated with your specified PythonAnywhere Flask app URL
+    // Your PythonAnywhere domain for the Flask backend
+    // This has been updated based on previous messages.
     const API_URL = 'https://OSUfrk09.pythonanywhere.com/events'; 
 
     fetch(API_URL)
@@ -13,7 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(events => {
             if (events.length === 0) {
-                eventsContainer.innerHTML = '<p>No upcoming events found.</p>';
+                if (eventsContainer) { // Defensive check
+                    eventsContainer.innerHTML = '<p>No upcoming events found.</p>';
+                } else {
+                    console.error("Error: 'event-list-container' element not found to display message.");
+                }
                 return;
             }
 
@@ -29,37 +34,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }, {});
 
             for (const monthYear in eventsByMonth) {
-                const monthHeader = document.createElement('h3');
-                monthHeader.textContent = monthYear;
-                eventsContainer.appendChild(monthHeader);
+                if (eventsContainer) { // Defensive check
+                    const monthHeader = document.createElement('h3');
+                    monthHeader.textContent = monthYear;
+                    eventsContainer.appendChild(monthHeader);
 
-                eventsByMonth[monthYear].forEach(event => {
-                    const eventElement = document.createElement('div');
-                    eventElement.classList.add('event-card');
+                    eventsByMonth[monthYear].forEach(event => {
+                        const eventElement = document.createElement('div');
+                        eventElement.classList.add('event-card');
 
-                    const startsAt = new Date(event.starts_at);
-                    const endsAt = new Date(event.ends_at);
+                        const startsAt = new Date(event.starts_at);
+                        const endsAt = new Date(event.ends_at);
 
-                    const startDateFormatted = startsAt.toLocaleString('en-US', {
-                        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
+                        const startDateFormatted = startsAt.toLocaleString('en-US', {
+                            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
+                        });
+                        const endDateFormatted = endsAt.toLocaleString('en-US', {
+                            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
+                        });
+
+                        eventElement.innerHTML = `
+                            <h4>${event.name}</h4>
+                            <p><strong>Starts:</strong> ${startDateFormatted}</p>
+                            <p><strong>Ends:</strong> ${endDateFormatted}</p>
+                            <p>${event.location}</p> <!-- Location label removed here -->
+                            ${event.registration_url ? `<p><a href="${event.registration_url}" target="_blank">Register Here</a></p>` : ''}
+                        `;
+                        eventsContainer.appendChild(eventElement);
                     });
-                    const endDateFormatted = endsAt.toLocaleString('en-US', {
-                        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
-                    });
-
-                    eventElement.innerHTML = `
-                        <h4>${event.name}</h4>
-                        <p><strong>Starts:</strong> ${startDateFormatted}</p>
-                        <p><strong>Ends:</strong> ${endDateFormatted}</p>
-                        <p><strong>Location:</strong> ${event.location}</p>
-                        ${event.registration_url ? `<p><a href="${event.registration_url}" target="_blank">Register Here</a></p>` : ''}
-                    `;
-                    eventsContainer.appendChild(eventElement);
-                });
+                } else {
+                    console.error("Error: 'event-list-container' element not found to append events.");
+                    break; // Exit the loop if container is missing
+                }
             }
         })
         .catch(error => {
             console.error('Error fetching events:', error);
-            eventsContainer.innerHTML = `<p>Error loading events: ${error.message}. Please try again later.</p>`;
+            if (eventsContainer) { // Defensive check
+                eventsContainer.innerHTML = `<p>Error loading events: ${error.message}. Please try again later.</p>`;
+            } else {
+                console.error("Could not display error message: 'event-list-container' not found.");
+            }
         });
 });
