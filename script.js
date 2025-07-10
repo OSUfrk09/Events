@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventsContainer = document.getElementById('events-container');
 
     // Updated with your specified PythonAnywhere Flask app URL
-    const BASE_API_URL = 'https://OSUfrk09.pythonanywhere.com/events';
+    const BASE_API_URL = 'https://osufrk09.pythonanywhere.com/events';
 
     // Add a cache-busting timestamp to the URL
     const API_URL = `${BASE_API_URL}?_t=${new Date().getTime()}`; // Appends a unique timestamp
