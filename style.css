@@ -6,7 +6,7 @@ body {
 
 h1 {
     color: #fff; /* Changed h1 color to white */
-    text-align: Left; /* Changed text alignment to left */
+    text-align: center; /* Changed text alignment to left */
     margin-bottom: 10px;
 }
 
@@ -21,7 +21,7 @@ h1 {
 
 /* Styling for individual event items - now a flex container */
 .event-item {
-    border-bottom: 0px solid #eee; /* Changed border-bottom to 0 */
+    border-bottom: 1px solid #000000; /* Changed border-bottom to 0 */
     padding: 0px 0; /* Changed padding to 0 */
     display: flex;
     align-items: stretch; /* Ensures children stretch to fill height */
