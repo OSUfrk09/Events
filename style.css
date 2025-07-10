@@ -1,19 +1,21 @@
+/* Note: The 'body' selector needs to be at the top of the CSS file.
+   The 'font-family: Arial, sans-serif;' line should be within this selector. */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0px; /* Changed margin to 0 */
-    background-color: #2C2D2E; /* Changed background color to dark gray */
+    font-family: Arial, sans-serif; /* Reverted font to Arial/sans-serif */
+    margin: 0px;
+    background-color: #2C2D2E;
 }
 
 h1 {
-    color: #fff; /* Changed h1 color to white */
-    text-align: center; /* Changed text alignment to left */
+    color: #fff;
+    text-align: center;
     margin-bottom: 10px;
 }
 
 #featured-events-container,
 #event-list-container {
-    background-color: #fff; /* Base background for the container */
-    padding: 0px; /* Changed padding to 0 */
+    background-color: #fff;
+    padding: 0px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -21,10 +23,10 @@ h1 {
 
 /* Styling for individual event items - now a flex container */
 .event-item {
-    border-bottom: 1px solid #000000; /* Changed border-bottom to 0 */
-    padding: 0px 0; /* Changed padding to 0 */
+    border-bottom: 1px solid #000000;
+    padding: 0px 0;
     display: flex;
-    align-items: stretch; /* Ensures children stretch to fill height */
+    align-items: stretch;
     gap: 15px;
 }
 
@@ -34,38 +36,38 @@ h1 {
 
 /* Alternating background colors for event items */
 #featured-events-container .event-item:nth-child(odd) {
-    background-color: #1565C0; /* Blue for odd rows */
+    background-color: #1565C0;
 }
 
 #featured-events-container .event-item:nth-child(even) {
-    background-color: #0090DB; /* Darker blue for even rows */
+    background-color: #0090DB;
 }
 
 #event-list-container .event-item:nth-child(odd) {
-    background-color: #1565C0; /* Blue for odd rows */
+    background-color: #1565C0;
 }
 
 #event-list-container .event-item:nth-child(even) {
-    background-color: #0090DB; /* Darker blue for even rows */
+    background-color: #0090DB;
 }
 
 /* New styling for the date box */
 .event-date-box {
     flex-shrink: 0;
-    width: 100px; /* Increased width to 100px */
-    background-color: #00D3AD; /* Changed background color to green */
+    width: 100px;
+    background-color: #00D3AD;
     color: #fff;
-    border-radius: 0px; /* Removed overall border-radius */
-    border-top-right-radius: 8px; /* Added specific border-radius */
-    border-bottom-right-radius: 8px; /* Added specific border-radius */
+    border-radius: 0px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
     display: flex;
-    flex-direction: column; /* Ensure vertical centering even if content wraps */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 1.1em;
+    font-size: 1.5em; /* Increased font size */
     font-weight: bold;
     text-align: center;
-    border-bottom: 1px solid #000000; /* Added bottom border */
+    border-bottom: 1px solid #000000;
 }
 
 /* Styling for the content inside the date box */
@@ -81,34 +83,35 @@ h1 {
 
 /* Event Title */
 .event-item h3 {
-    color: #00D3AD; /* Changed h3 color to green */
-    margin-top: 10px; /* Changed margin-top to 10px */
+    color: #00D3AD;
+    margin-top: 10px;
     margin-bottom: 5px;
 }
 
 /* Event Time */
 .event-time {
     font-size: 0.9em;
-    color: #fff; /* Changed text color to white */
+    font-weight: bold; /* Added font-weight bold */
+    color: #fff;
     line-height: 1.2;
 }
 
 /* Event Location */
 .event-location {
     font-style: italic;
-    color: #fff; /* Changed text color to white */
-    margin-top: 5px;
+    color: #fff;
+    margin-top: 0px; /* Changed margin-top to 0 */
 }
 
 /* Signup Status */
 .event-signup {
     font-weight: bold;
-    color: green;
-    background-color: #e6ffe6;
+    color: white; /* Changed color to white */
+    background-color: #00D3AD; /* Changed background color to green */
     padding: 5px 8px;
-    border-radius: 3px;
+    border-radius: 8px; /* Changed border-radius to 8px */
     display: inline-block;
-    margin-top: 5px;
+    margin-top: 0px; /* Changed margin-top to 0 */
     align-self: flex-start;
 }
 
