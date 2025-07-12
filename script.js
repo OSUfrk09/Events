@@ -1,5 +1,7 @@
+// script.js (JavaScript Version 1.4, with setInterval added)
+
 document.addEventListener('DOMContentLoaded', () => {
-    const featuredEventsH1 = document.querySelector('h1:first-of-type');
+    const featuredEventsH1 = document.getElementById('featured-events-title'); // Uses ID for robustness
     const featuredEventsContainer = document.getElementById('featured-events-container');
     const upcomingEventsContainer = document.getElementById('event-list-container');
 
@@ -44,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupStatus = `<p class='event-signup'>Signup Available</p>`;
                 }
 
-                // Conditionally include the location paragraph
                 const locationHtml = (event.location && event.location.trim() !== '') ?
                                      `<p class='event-location'>${event.location}</p>` : '';
 
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="event-info-box">
                         <h3>${event.name}</h3>
                         <p class='event-time'>${timeRange}</p>
-                        ${locationHtml} <!-- Insert location conditionally -->
+                        ${locationHtml}
                         ${signupStatus}
                     </div>
                 `;
@@ -69,36 +70,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    fetch(API_URL)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(events => {
-            const featuredEvents = events.filter(event => event.featured === true);
-            const upcomingEvents = events.filter(event => event.featured !== true);
-
-            renderEvents(featuredEventsContainer, featuredEvents, true);
-            renderEvents(upcomingEventsContainer, upcomingEvents);
-
-            if (featuredEvents.length === 0) {
-                if (featuredEventsH1) {
-                    featuredEventsH1.style.display = 'none';
+    const fetchAndRenderEvents = () => { // New function to encapsulate the fetch logic
+        fetch(API_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                return response.json();
+            })
+            .then(events => {
+                // Clear loading messages if they exist from a previous load attempt
+                if (featuredEventsContainer) featuredEventsContainer.innerHTML = '';
+                if (upcomingEventsContainer) upcomingEventsContainer.innerHTML = '';
+
+                const featuredEvents = events.filter(event => event.featured === true);
+                const upcomingEvents = events.filter(event => event.featured !== true);
+
+                renderEvents(featuredEventsContainer, featuredEvents, true);
+                renderEvents(upcomingEventsContainer, upcomingEvents);
+
+                // Hide the entire featured section if no featured events are found
+                if (featuredEvents.length === 0) {
+                    if (featuredEventsH1) featuredEventsH1.style.display = 'none'; // Hide the H1 title
+                    if (featuredEventsContainer) featuredEventsContainer.style.display = 'none'; // Hide the container
+                } else {
+                    // Ensure the section is visible if events are found after a previous refresh hid it
+                    if (featuredEventsH1) featuredEventsH1.style.display = ''; // Reset to default display
+                    if (featuredEventsContainer) featuredEventsContainer.style.display = ''; // Reset to default display
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching events:', error);
                 if (featuredEventsContainer) {
-                    featuredEventsContainer.style.display = 'none';
+                    featuredEventsContainer.innerHTML = '<p>Failed to load featured events. Please try again later.</p>';
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching events:', error);
-            if (featuredEventsContainer) {
-                featuredEventsContainer.innerHTML = '<p>Failed to load featured events. Please try again later.</p>';
-            }
-            if (upcomingEventsContainer) {
-                upcomingEventsContainer.innerHTML = '<p>Failed to load upcoming events. Please try again later.</p>';
-            }
-        });
+                if (upcomingEventsContainer) {
+                    upcomingEventsContainer.innerHTML = '<p>Failed to load upcoming events. Please try again later.</p>';
+                }
+            });
+    };
+
+    // Initial fetch when the page loads
+    fetchAndRenderEvents();
+
+    // Refresh every 15 minutes (15 * 60 * 1000 milliseconds)
+    setInterval(fetchAndRenderEvents, 15 * 60 * 1000);
 });
