@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const featuredEventsH1 = document.querySelector('h1:first-of-type');
     const featuredEventsContainer = document.getElementById('featured-events-container');
     const upcomingEventsContainer = document.getElementById('event-list-container');
 
@@ -43,10 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupStatus = `<p class='event-signup'>Signup Available</p>`;
                 }
 
+                // Conditionally include the location paragraph
+                const locationHtml = (event.location && event.location.trim() !== '') ?
+                                     `<p class='event-location'>${event.location}</p>` : '';
+
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event-item';
 
-                // --- MODIFIED HTML STRUCTURE HERE ---
                 eventDiv.innerHTML = `
                     <div class="event-date-box">
                         <p>${formattedDate}</p>
@@ -54,12 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="event-info-box">
                         <h3>${event.name}</h3>
                         <p class='event-time'>${timeRange}</p>
-                        <p class='event-location'>${event.location}</p>
+                        ${locationHtml} <!-- Insert location conditionally -->
                         ${signupStatus}
                     </div>
                 `;
-                // --- END MODIFIED HTML STRUCTURE ---
-
                 container.appendChild(eventDiv);
             });
         } else {
@@ -80,6 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderEvents(featuredEventsContainer, featuredEvents, true);
             renderEvents(upcomingEventsContainer, upcomingEvents);
+
+            if (featuredEvents.length === 0) {
+                if (featuredEventsH1) {
+                    featuredEventsH1.style.display = 'none';
+                }
+                if (featuredEventsContainer) {
+                    featuredEventsContainer.style.display = 'none';
+                }
+            }
         })
         .catch(error => {
             console.error('Error fetching events:', error);
