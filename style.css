@@ -79,6 +79,7 @@ h1 {
 /* Styling for the info box (rest of the event details) */
 .event-info-box {
     flex-grow: 1;
+    margin-right: 15px;
 }
 
 /* Event Title */
