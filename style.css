@@ -1,7 +1,7 @@
 /* Note: The 'body' selector needs to be at the top of the CSS file.
    The 'font-family: Arial, sans-serif;' line should be within this selector. */
 body {
-    font-family: Arial, sans-serif; /* Reverted font to Arial/sans-serif */
+    font-family: Arial, sans-serif;
     margin: 0px;
     background-color: #2C2D2E;
 }
@@ -19,6 +19,25 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+}
+
+/* Updated for scrolling, hiding the scrollbar, and smooth behavior */
+#event-list-container {
+    max-height: 1080px; /* Max height for the scrollable area */
+    overflow-y: auto; /* Add vertical scrollbar if content overflows */
+    position: relative; /* Needed for scrolling manipulation */
+    scroll-behavior: smooth; /* Added for smooth scrolling */
+
+    /* Hide scrollbar for Chrome, Safari, and Opera */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for Internet Explorer, Edge */
+    -ms-overflow-style: none;
+
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
 }
 
 /* Styling for individual event items - now a flex container */
@@ -64,7 +83,7 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 1.5em; /* Increased font size */
+    font-size: 1.5em;
     font-weight: bold;
     text-align: center;
     border-bottom: 1px solid #000000;
@@ -92,7 +111,7 @@ h1 {
 /* Event Time */
 .event-time {
     font-size: 0.9em;
-    font-weight: bold; /* Added font-weight bold */
+    font-weight: bold;
     color: #fff;
     line-height: 1.2;
 }
@@ -101,18 +120,18 @@ h1 {
 .event-location {
     font-style: italic;
     color: #fff;
-    margin-top: 0px; /* Changed margin-top to 0 */
+    margin-top: 0px;
 }
 
 /* Signup Status */
 .event-signup {
     font-weight: bold;
-    color: white; /* Changed color to white */
-    background-color: #00D3AD; /* Changed background color to green */
+    color: white;
+    background-color: #00D3AD;
     padding: 5px 8px;
-    border-radius: 8px; /* Changed border-radius to 8px */
+    border-radius: 8px;
     display: inline-block;
-    margin-top: 0px; /* Changed margin-top to 0 */
+    margin-top: 0px;
     align-self: flex-start;
 }
 
