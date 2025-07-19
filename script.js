@@ -1,4 +1,4 @@
-// script.js (JavaScript Version 1.7.4 - Refining Continuous Loop Scrolling Further)
+// script.js (JavaScript Version 1.8 - Continuous Loop Scrolling with 5-second delay)
 
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsH1 = document.getElementById('featured-events-title');
@@ -73,10 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let scrollIntervalId; // Variable to hold the interval for scrolling
     let animationFrameId; // Variable to hold the requestAnimationFrame ID
     let originalContentHeight = 0; // Store the height of the original set of events
+    let isPausedAtLoopEnd = false; // New flag to manage the delay state
 
     const startAutoScroll = () => {
         const scrollSpeed = 1; // Pixels to scroll per step
         const scrollDelay = 300; // Milliseconds between scroll steps
+        const loopEndPause = 5000; // 5 seconds delay at the end of the loop
 
         if (scrollIntervalId) {
             clearInterval(scrollIntervalId);
@@ -84,40 +86,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
         }
+        isPausedAtLoopEnd = false; // Reset the pause flag when starting auto-scroll
 
         if (!upcomingEventsContainer) {
             console.warn("Upcoming events container not found, cannot start auto-scroll.");
             return;
         }
 
-        // Only start scrolling if there's enough content to scroll
         if (upcomingEventsContainer.scrollHeight > upcomingEventsContainer.clientHeight) {
 
             // Capture the height of the original content *before* duplication
-            // This needs to be done *after* initial render and potential layout adjustments
             originalContentHeight = upcomingEventsContainer.scrollHeight;
 
-            // --- IMPORTANT CHANGE: Duplicate the content directly within the container ---
-            // Instead of using a wrapper for duplication, clone the entire existing content
-            // and append it directly. This relies on the originalContentHeight being accurate.
+            // Duplicate the content directly within the container
             const clonedContent = upcomingEventsContainer.innerHTML;
             upcomingEventsContainer.innerHTML += clonedContent;
-            // --- END IMPORTANT CHANGE ---
-
 
             const scrollStep = () => {
-                // Check if we have scrolled past the original content height
+                if (isPausedAtLoopEnd) { // If paused, just return and wait for setTimeout
+                    animationFrameId = requestAnimationFrame(scrollStep); // Keep the rAF loop alive
+                    return;
+                }
+
                 if (upcomingEventsContainer.scrollTop >= originalContentHeight) {
-                    // Reset to the equivalent position at the beginning of the duplicated content
-                    upcomingEventsContainer.scrollTop -= originalContentHeight;
-                    // Optional: If you find an initial slight jump, you could try setting it explicitly to 0 first,
-                    // and then add a minimal scrollSpeed if needed immediately after.
-                    // upcomingEventsContainer.scrollTop = 0; // Instant jump to top (of the second set)
+                    // Stop scrolling for the delay
+                    isPausedAtLoopEnd = true;
+                    clearInterval(scrollIntervalId); // Stop the interval that triggers animation frames
+                    cancelAnimationFrame(animationFrameId); // Stop the current animation frame
+
+                    setTimeout(() => {
+                        upcomingEventsContainer.scrollTop -= originalContentHeight; // Reset position
+                        isPausedAtLoopEnd = false; // Release the pause
+                        startAutoScroll(); // Restart the auto-scroll completely
+                    }, loopEndPause);
+
                 } else {
                     upcomingEventsContainer.scrollTop += scrollSpeed; // Continue scrolling down
                 }
 
-                if (scrollIntervalId !== null) {
+                if (!isPausedAtLoopEnd) { // Only request next frame if not paused
                     animationFrameId = requestAnimationFrame(scrollStep);
                 }
             };
@@ -125,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             animationFrameId = requestAnimationFrame(scrollStep);
 
             scrollIntervalId = setInterval(() => {
-                if (scrollIntervalId !== null) {
+                if (!isPausedAtLoopEnd && scrollIntervalId !== null) { // Only trigger if not paused and active
                     animationFrameId = requestAnimationFrame(scrollStep);
                 }
             }, scrollDelay);
@@ -162,8 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const featuredEvents = events.filter(event => event.featured === true);
                 let upcomingEvents = events.filter(event => event.featured !== true);
 
-                // Python backend already limits to 30 events, so no need to slice here.
-
                 renderEvents(featuredEventsContainer, featuredEvents, true);
                 renderEvents(upcomingEventsContainer, upcomingEvents);
 
@@ -176,8 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Delay scrolling start to allow DOM to settle and heights to be calculated
-                // This delay is CRITICAL for accurate originalContentHeight calculation.
-                setTimeout(startAutoScroll, 5000); // Increased delay slightly
+                setTimeout(startAutoScroll, 200); // Critical delay for accurate height
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
