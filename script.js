@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Delay scrolling start to allow DOM to settle and heights to be calculated
                 // This delay is CRITICAL for accurate originalContentHeight calculation.
-                setTimeout(startAutoScroll, 200); // Increased delay slightly
+                setTimeout(startAutoScroll, 5000); // Increased delay slightly
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
