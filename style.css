@@ -16,7 +16,7 @@ h1 {
 #event-list-container {
     background-color: #fff;
     padding: 0px;
-    border-radius: 0px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
@@ -59,7 +59,7 @@ h1 {
 }
 
 #featured-events-container .event-item:nth-child(even) {
-    background-color: #0090DB;
+    background-color: #1770d6
 }
 
 #event-list-container .event-item:nth-child(odd) {
@@ -67,7 +67,7 @@ h1 {
 }
 
 #event-list-container .event-item:nth-child(even) {
-    background-color: #0090DB;
+    background-color: #1770d6;
 }
 
 /* New styling for the date box */
