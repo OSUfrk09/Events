@@ -164,8 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let upcomingEvents = events.filter(event => event.featured !== true);
 
                 // Limit upcoming events to 30
-                if (upcomingEvents.length > 15) {
-                    upcomingEvents = upcomingEvents.slice(0, 15);
+                if (upcomingEvents.length > 30) {
+                    upcomingEvents = upcomingEvents.slice(0, 30);
                 }
 
                 renderEvents(featuredEventsContainer, featuredEvents, true);
