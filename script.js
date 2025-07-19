@@ -1,4 +1,4 @@
-// script.js (JavaScript Version 1.6 - Fixing Auto-Scroll Restart Offset with scrollIntoView())
+// script.js (JavaScript Version 1.7.2 - Refined Continuous Loop Scrolling)
 
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsH1 = document.getElementById('featured-events-title');
@@ -72,15 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let scrollIntervalId; // Variable to hold the interval for scrolling
     let animationFrameId; // Variable to hold the requestAnimationFrame ID
+    let originalContentHeight = 0; // Store the height of the original set of events
 
     const startAutoScroll = () => {
         const scrollSpeed = 1; // Pixels to scroll per step
         const scrollDelay = 300; // Milliseconds between scroll steps
 
-        // No longer strictly needed with scrollIntoView(), but can be kept as a small buffer if desired.
-        // const restartThreshold = 5;
-
-        // Clear any existing scroll intervals and animation frames
         if (scrollIntervalId) {
             clearInterval(scrollIntervalId);
         }
@@ -94,42 +91,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (upcomingEventsContainer.scrollHeight > upcomingEventsContainer.clientHeight) {
-            const scrollStep = () => {
-                // Check if we are near or at the bottom. Using a small buffer is still good practice.
-                const scrolledToBottom = (upcomingEventsContainer.scrollTop + upcomingEventsContainer.clientHeight) >= (upcomingEventsContainer.scrollHeight - scrollSpeed); // Use scrollSpeed as a small threshold
 
-                if (scrolledToBottom) {
-                    // *** SOLUTION 1: Use scrollIntoView() to reset to the first event item ***
-                    const firstEventItem = upcomingEventsContainer.querySelector('.event-item');
-                    if (firstEventItem) {
-                        firstEventItem.scrollIntoView({ behavior: 'smooth', block: 'start' }); // Smoothly scroll to the top of the first item
-                    } else {
-                        // Fallback if somehow no items found (unlikely after render)
-                        upcomingEventsContainer.scrollTop = 0;
-                    }
+            // --- IMPORTANT CHANGE: Duplicate the content inside a temporary wrapper ---
+            // This ensures we get the *exact* height of the first set of elements correctly.
+            const originalContentWrapper = document.createElement('div');
+            originalContentWrapper.className = 'original-events-wrapper'; // Add a class for potential debugging/styling
+
+            const eventItems = Array.from(upcomingEventsContainer.children); // Get all current items
+            eventItems.forEach(item => {
+                originalContentWrapper.appendChild(item); // Move existing items into the wrapper
+            });
+
+            upcomingEventsContainer.appendChild(originalContentWrapper); // Add the wrapper back
+
+            // Capture the height of the original content wrapper
+            // This needs to be done *after* it's in the DOM
+            originalContentHeight = originalContentWrapper.offsetHeight; // Use offsetHeight for total height including padding/border
+
+            // Now clone the entire wrapper and append it
+            const clonedContentWrapper = originalContentWrapper.cloneNode(true);
+            clonedContentWrapper.className = 'cloned-events-wrapper'; // Add a class for potential debugging/styling
+            upcomingEventsContainer.appendChild(clonedContentWrapper);
+
+            // --- END IMPORTANT CHANGE ---
+
+            const scrollStep = () => {
+                // Check if we have scrolled past the original content height
+                if (upcomingEventsContainer.scrollTop >= originalContentHeight) {
+                    // Reset to the equivalent position at the beginning of the duplicated content
+                    // By subtracting originalContentHeight, we effectively loop back without a jump.
+                    upcomingEventsContainer.scrollTop = upcomingEventsContainer.scrollTop - originalContentHeight;
                 } else {
-                    upcomingEventsContainer.scrollTop += scrollSpeed; // Scroll down
+                    upcomingEventsContainer.scrollTop += scrollSpeed; // Continue scrolling down
                 }
 
-                // Continue the animation loop if not paused
                 if (scrollIntervalId !== null) {
                     animationFrameId = requestAnimationFrame(scrollStep);
                 }
             };
 
-            // Start the first scroll step
             animationFrameId = requestAnimationFrame(scrollStep);
 
-            // Set an interval to trigger the next scroll step after a delay, allowing time for readability
             scrollIntervalId = setInterval(() => {
-                // Only request a new frame if the interval is still active (not cleared by hover)
                 if (scrollIntervalId !== null) {
                     animationFrameId = requestAnimationFrame(scrollStep);
                 }
             }, scrollDelay);
 
 
-            // Pause scrolling on hover
             upcomingEventsContainer.addEventListener('mouseenter', () => {
                 clearInterval(scrollIntervalId);
                 cancelAnimationFrame(animationFrameId);
@@ -137,9 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 animationFrameId = null;
             });
 
-            // Resume scrolling on mouse leave
             upcomingEventsContainer.addEventListener('mouseleave', () => {
-                // Only restart if currently paused
                 if (scrollIntervalId === null && animationFrameId === null) {
                     startAutoScroll();
                 }
@@ -163,10 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const featuredEvents = events.filter(event => event.featured === true);
                 let upcomingEvents = events.filter(event => event.featured !== true);
 
-                // Limit upcoming events to 30
-                if (upcomingEvents.length > 30) {
-                    upcomingEvents = upcomingEvents.slice(0, 30);
-                }
+                // Python backend already limits to 30 events, so no need to slice here.
 
                 renderEvents(featuredEventsContainer, featuredEvents, true);
                 renderEvents(upcomingEventsContainer, upcomingEvents);
@@ -179,11 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (featuredEventsContainer) featuredEventsContainer.style.display = '';
                 }
 
-                // IMPORTANT: Ensure the container is fully rendered and measured before starting scroll.
-                // A small timeout here can sometimes help if rendering isn't immediate.
-                // If the issue persists, try uncommenting the following line and adjusting the delay.
-                // setTimeout(startAutoScroll, 50); // Give browser a moment to lay out elements
-                startAutoScroll();
+                // Delay scrolling start to allow DOM to settle and heights to be calculated
+                setTimeout(startAutoScroll, 100);
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
@@ -204,9 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     };
 
-    // Initial fetch when the page loads
     fetchAndRenderEvents();
-
-    // Refresh every 15 minutes (15 * 60 * 1000 milliseconds)
     setInterval(fetchAndRenderEvents, 15 * 60 * 1000);
 });
