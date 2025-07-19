@@ -1,4 +1,4 @@
-// script.js (JavaScript Version 1.7.3 - Refined Continuous Loop Scrolling)
+// script.js (JavaScript Version 1.7.4 - Refining Continuous Loop Scrolling Further)
 
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsH1 = document.getElementById('featured-events-title');
@@ -93,34 +93,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // Only start scrolling if there's enough content to scroll
         if (upcomingEventsContainer.scrollHeight > upcomingEventsContainer.clientHeight) {
 
-            // --- Capture the original height BEFORE duplicating content ---
-            // Create a temporary wrapper to measure the height accurately
-            const originalContentWrapper = document.createElement('div');
-            originalContentWrapper.className = 'original-events-wrapper';
+            // Capture the height of the original content *before* duplication
+            // This needs to be done *after* initial render and potential layout adjustments
+            originalContentHeight = upcomingEventsContainer.scrollHeight;
 
-            // Move the existing event items into this wrapper
-            const eventItems = Array.from(upcomingEventsContainer.children);
-            eventItems.forEach(item => {
-                originalContentWrapper.appendChild(item);
-            });
-
-            // Append the wrapper back to the container
-            upcomingEventsContainer.appendChild(originalContentWrapper);
-
-            // Capture the height of the original content using offsetHeight
-            originalContentHeight = originalContentWrapper.offsetHeight;
-
-            // Now clone the entire wrapper and append it
-            const clonedContentWrapper = originalContentWrapper.cloneNode(true);
-            clonedContentWrapper.className = 'cloned-events-wrapper'; // Differentiate if needed for debugging
-            upcomingEventsContainer.appendChild(clonedContentWrapper);
+            // --- IMPORTANT CHANGE: Duplicate the content directly within the container ---
+            // Instead of using a wrapper for duplication, clone the entire existing content
+            // and append it directly. This relies on the originalContentHeight being accurate.
+            const clonedContent = upcomingEventsContainer.innerHTML;
+            upcomingEventsContainer.innerHTML += clonedContent;
             // --- END IMPORTANT CHANGE ---
+
 
             const scrollStep = () => {
                 // Check if we have scrolled past the original content height
                 if (upcomingEventsContainer.scrollTop >= originalContentHeight) {
                     // Reset to the equivalent position at the beginning of the duplicated content
                     upcomingEventsContainer.scrollTop -= originalContentHeight;
+                    // Optional: If you find an initial slight jump, you could try setting it explicitly to 0 first,
+                    // and then add a minimal scrollSpeed if needed immediately after.
+                    // upcomingEventsContainer.scrollTop = 0; // Instant jump to top (of the second set)
                 } else {
                     upcomingEventsContainer.scrollTop += scrollSpeed; // Continue scrolling down
                 }
@@ -184,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Delay scrolling start to allow DOM to settle and heights to be calculated
-                setTimeout(startAutoScroll, 100); // 100ms delay as a starting point
+                // This delay is CRITICAL for accurate originalContentHeight calculation.
+                setTimeout(startAutoScroll, 200); // Increased delay slightly
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
