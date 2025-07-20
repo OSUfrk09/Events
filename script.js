@@ -1,4 +1,4 @@
-// script.js (JavaScript Version 1.8 - Continuous Loop Scrolling with 5-second delay)
+// script.js (JavaScript Version 1.1 - Continuous Loop Scrolling with 5-second delay, hide N/A Location)
 
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsH1 = document.getElementById('featured-events-title');
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         timeRange = `Starts: ${formattedStartTime}`;
                     }
                 } else if (isValidEndDate) {
+                    // If only end date is valid, assume starts at N/A, ends at time
                     const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
                     timeRange = `Ends: ${formattedEndTime}`;
                 }
@@ -46,8 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupStatus = `<p class='event-signup'>Signup Available</p>`;
                 }
 
-                const locationHtml = (event.location && event.location.trim() !== '') ?
+                // MODIFIED LINE: Conditionally create locationHtml
+                const locationHtml = (event.location && event.location.trim() !== '' && event.location !== 'N/A Location') ?
                                      `<p class='event-location'>${event.location}</p>` : '';
+                // END MODIFIED LINE
 
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event-item';
@@ -137,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, scrollDelay);
 
-
             upcomingEventsContainer.addEventListener('mouseenter', () => {
                 clearInterval(scrollIntervalId);
                 cancelAnimationFrame(animationFrameId);
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Delay scrolling start to allow DOM to settle and heights to be calculated
-                setTimeout(startAutoScroll, 200); // Critical delay for accurate height
+                setTimeout(startAutoScroll, 2000); // Critical delay for accurate height
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
