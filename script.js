@@ -1,4 +1,4 @@
-// script.js (JavaScript Version 1.5 - Continuous Loop Scrolling, hide N/A Location, seamless loop fix)
+// script.js (JavaScript Version 1.6 - Continuous Loop Scrolling, hide N/A Location, seamless loop fix, add day of week)
 
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsH1 = document.getElementById('featured-events-title');
@@ -23,10 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isValidStartDate = !isNaN(startDate.getTime());
                 const isValidEndDate = !isNaN(endDate.getTime());
 
+                // NEW: Variable for formatted day of the week
+                let formattedDayOfWeek = 'N/A Day'; // Default if start date is invalid
                 let formattedDate = 'N/A Date';
                 let timeRange = 'N/A Time';
 
                 if (isValidStartDate) {
+                    // NEW: Format the full day of the week
+                    formattedDayOfWeek = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(startDate); // e.g., "Friday"
                     formattedDate = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short' }).format(startDate);
                     const formattedStartTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(startDate);
 
@@ -54,7 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 eventDiv.innerHTML = `
                     <div class="event-date-box">
-                        <p>${formattedDate}</p>
+                        <p class="event-day-of-week">${formattedDayOfWeek}</p> <!-- NEW: Day of week -->
+                        <p class="event-date">${formattedDate}</p> <!-- Added class for potential styling -->
                     </div>
                     <div class="event-info-box">
                         <h3>${event.name}</h3>
@@ -67,11 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Add a spacer to the end of the scrollable list
-            if (!isFeaturedSection) { // Only add to the scrollable upcoming events list
+            if (!isFeaturedSection) {
                 const spacerDiv = document.createElement('div');
                 spacerDiv.className = 'end-of-list-spacer';
                 spacerDiv.style.height = '15px';
-                spacerDiv.style.backgroundColor = '#2C2D2E'; // Match body background
+                spacerDiv.style.backgroundColor = '#2C2D2E';
                 container.appendChild(spacerDiv);
             }
 
@@ -82,15 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let scrollIntervalId;
     let animationFrameId;
-    // Renamed for clarity: this is the height of one set of (events + spacer)
-    let heightOfFirstContentBlockWithSpacer = 0; 
+    let heightOfFirstContentBlockWithSpacer = 0;
     let isPausedAtLoopEnd = false;
 
     const startAutoScroll = () => {
-        const scrollSpeed = 1; // Pixels to scroll per step
-        const scrollDelay = 300; // Milliseconds between scroll steps
-        const loopEndPause = 5000; // 5 seconds delay at the end of the loop
-        const spacerHeight = 15; // Define the spacer height as a constant
+        const scrollSpeed = 1;
+        const scrollDelay = 300;
+        const loopEndPause = 5000;
+        const spacerHeight = 15;
 
         if (scrollIntervalId) {
             clearInterval(scrollIntervalId);
@@ -107,12 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (upcomingEventsContainer.scrollHeight > upcomingEventsContainer.clientHeight) {
 
-            // Capture the height of the original content *before* duplication
-            // This is the height of the first full set of events + spacer
-            heightOfFirstContentBlockWithSpacer = upcomingEventsContainer.scrollHeight; 
+            heightOfFirstContentBlockWithSpacer = upcomingEventsContainer.scrollHeight;
 
-            // Duplicate the content directly within the container
-            // Now the content looks like: (Events1 + Spacer1) + (Events2 + Spacer2)
             const clonedContent = upcomingEventsContainer.innerHTML;
             upcomingEventsContainer.innerHTML += clonedContent;
 
@@ -122,17 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Check if we've scrolled past the first full set of events (including its spacer)
                 if (upcomingEventsContainer.scrollTop >= heightOfFirstContentBlockWithSpacer) {
                     isPausedAtLoopEnd = true;
                     clearInterval(scrollIntervalId);
                     cancelAnimationFrame(animationFrameId);
 
                     setTimeout(() => {
-                        // CRITICAL CHANGE: Reset scroll position to *just past the first spacer*
-                        // This moves the scrollbar to the beginning of the *second set of events*,
-                        // creating the seamless loop.
-                        upcomingEventsContainer.scrollTop = spacerHeight; 
+                        upcomingEventsContainer.scrollTop = spacerHeight;
                         isPausedAtLoopEnd = false;
                         startAutoScroll();
                     }, loopEndPause);
@@ -196,8 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (featuredEventsContainer) featuredEventsContainer.style.display = '';
                 }
 
-                // Delay scrolling start to allow DOM to settle and heights to be calculated
-                setTimeout(startAutoScroll, 2000); // Critical delay for accurate height
+                setTimeout(startAutoScroll, 200);
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
