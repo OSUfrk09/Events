@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (featuredEventsContainer) featuredEventsContainer.style.display = '';
                 }
 
-                setTimeout(startAutoScroll, 200);
+                setTimeout(startAutoScroll, 2000);
             })
             .catch(error => {
                 console.error('Error fetching events:', error);
