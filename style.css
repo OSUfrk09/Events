@@ -1,3 +1,5 @@
+/* style.css (Version 1.1 - Styling for day of week) */
+
 /* Note: The 'body' selector needs to be at the top of the CSS file.
    The 'font-family: Arial, sans-serif;' line should be within this selector. */
 body {
@@ -29,7 +31,8 @@ h1 {
     scroll-behavior: smooth; /* Added for smooth scrolling */
 
     /* Hide scrollbar for Chrome, Safari, and Opera */
-    &::-webkit-scrollbar {
+    /* If not using a CSS preprocessor (like Sass), remove the '&' */
+    #event-list-container::-webkit-scrollbar { /* Corrected selector if no preprocessor */
         display: none;
     }
 
@@ -83,17 +86,31 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 1.5em;
-    font-weight: bold;
+    font-size: 1.5em; /* This will be the base for em units in child p tags */
+    font-weight: bold; /* This applies to the whole box, p tags might inherit or override */
     text-align: center;
-    border-bottom: 1px solid #000000;
+    /* REMOVED: border-bottom: 1px solid #000000; (based on previous recommendation) */
 }
 
 /* Styling for the content inside the date box */
 .event-date-box p {
-    margin: 0;
+    margin: 0; /* Ensure no default paragraph margins */
     line-height: 1.2;
 }
+
+/* NEW: Styling for the day of the week */
+.event-day-of-week {
+    font-size: 0.8em; /* Make it slightly smaller than the main date */
+    margin-bottom: 2px; /* Add slight space below day of week */
+    color: #fffffff
+}
+
+/* NEW: Styling for the date itself (added class in JS) */
+.event-date {
+    font-size: 1em; /* Ensures this is 1x the parent font size (1.5em from .event-date-box) */
+    color: #ffffff
+}
+
 
 /* Styling for the info box (rest of the event details) */
 .event-info-box {
@@ -132,7 +149,7 @@ h1 {
     border-radius: 8px;
     display: inline-block;
     margin-top: 0px;
-    align-self: flex-start;
+    /* Removed align-self as it only applies if direct parent is a flex container */
 }
 
 /* Basic Link Styling for Register Here */
