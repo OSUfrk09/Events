@@ -1,4 +1,4 @@
-// script.js (JavaScript Version 1.1 - Continuous Loop Scrolling with 5-second delay, hide N/A Location)
+// script.js (JavaScript Version 1.5 - Continuous Loop Scrolling, hide N/A Location, seamless loop fix)
 
 document.addEventListener('DOMContentLoaded', () => {
     const featuredEventsH1 = document.getElementById('featured-events-title');
@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         timeRange = `Starts: ${formattedStartTime}`;
                     }
                 } else if (isValidEndDate) {
-                    // If only end date is valid, assume starts at N/A, ends at time
                     const formattedEndTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(endDate);
                     timeRange = `Ends: ${formattedEndTime}`;
                 }
@@ -47,10 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupStatus = `<p class='event-signup'>Signup Available</p>`;
                 }
 
-                // MODIFIED LINE: Conditionally create locationHtml
                 const locationHtml = (event.location && event.location.trim() !== '' && event.location !== 'N/A Location') ?
                                      `<p class='event-location'>${event.location}</p>` : '';
-                // END MODIFIED LINE
 
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event-item';
@@ -68,20 +65,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 container.appendChild(eventDiv);
             });
+
+            // Add a spacer to the end of the scrollable list
+            if (!isFeaturedSection) { // Only add to the scrollable upcoming events list
+                const spacerDiv = document.createElement('div');
+                spacerDiv.className = 'end-of-list-spacer';
+                spacerDiv.style.height = '15px';
+                spacerDiv.style.backgroundColor = '#2C2D2E'; // Match body background
+                container.appendChild(spacerDiv);
+            }
+
         } else {
             container.innerHTML = `<p>No ${isFeaturedSection ? 'featured' : 'upcoming'} events found.</p>`;
         }
     };
 
-    let scrollIntervalId; // Variable to hold the interval for scrolling
-    let animationFrameId; // Variable to hold the requestAnimationFrame ID
-    let originalContentHeight = 0; // Store the height of the original set of events
-    let isPausedAtLoopEnd = false; // New flag to manage the delay state
+    let scrollIntervalId;
+    let animationFrameId;
+    // Renamed for clarity: this is the height of one set of (events + spacer)
+    let heightOfFirstContentBlockWithSpacer = 0; 
+    let isPausedAtLoopEnd = false;
 
     const startAutoScroll = () => {
         const scrollSpeed = 1; // Pixels to scroll per step
         const scrollDelay = 300; // Milliseconds between scroll steps
         const loopEndPause = 5000; // 5 seconds delay at the end of the loop
+        const spacerHeight = 15; // Define the spacer height as a constant
 
         if (scrollIntervalId) {
             clearInterval(scrollIntervalId);
@@ -89,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
         }
-        isPausedAtLoopEnd = false; // Reset the pause flag when starting auto-scroll
+        isPausedAtLoopEnd = false;
 
         if (!upcomingEventsContainer) {
             console.warn("Upcoming events container not found, cannot start auto-scroll.");
@@ -99,35 +108,40 @@ document.addEventListener('DOMContentLoaded', () => {
         if (upcomingEventsContainer.scrollHeight > upcomingEventsContainer.clientHeight) {
 
             // Capture the height of the original content *before* duplication
-            originalContentHeight = upcomingEventsContainer.scrollHeight;
+            // This is the height of the first full set of events + spacer
+            heightOfFirstContentBlockWithSpacer = upcomingEventsContainer.scrollHeight; 
 
             // Duplicate the content directly within the container
+            // Now the content looks like: (Events1 + Spacer1) + (Events2 + Spacer2)
             const clonedContent = upcomingEventsContainer.innerHTML;
             upcomingEventsContainer.innerHTML += clonedContent;
 
             const scrollStep = () => {
-                if (isPausedAtLoopEnd) { // If paused, just return and wait for setTimeout
-                    animationFrameId = requestAnimationFrame(scrollStep); // Keep the rAF loop alive
+                if (isPausedAtLoopEnd) {
+                    animationFrameId = requestAnimationFrame(scrollStep);
                     return;
                 }
 
-                if (upcomingEventsContainer.scrollTop >= originalContentHeight) {
-                    // Stop scrolling for the delay
+                // Check if we've scrolled past the first full set of events (including its spacer)
+                if (upcomingEventsContainer.scrollTop >= heightOfFirstContentBlockWithSpacer) {
                     isPausedAtLoopEnd = true;
-                    clearInterval(scrollIntervalId); // Stop the interval that triggers animation frames
-                    cancelAnimationFrame(animationFrameId); // Stop the current animation frame
+                    clearInterval(scrollIntervalId);
+                    cancelAnimationFrame(animationFrameId);
 
                     setTimeout(() => {
-                        upcomingEventsContainer.scrollTop -= originalContentHeight; // Reset position
-                        isPausedAtLoopEnd = false; // Release the pause
-                        startAutoScroll(); // Restart the auto-scroll completely
+                        // CRITICAL CHANGE: Reset scroll position to *just past the first spacer*
+                        // This moves the scrollbar to the beginning of the *second set of events*,
+                        // creating the seamless loop.
+                        upcomingEventsContainer.scrollTop = spacerHeight; 
+                        isPausedAtLoopEnd = false;
+                        startAutoScroll();
                     }, loopEndPause);
 
                 } else {
-                    upcomingEventsContainer.scrollTop += scrollSpeed; // Continue scrolling down
+                    upcomingEventsContainer.scrollTop += scrollSpeed;
                 }
 
-                if (!isPausedAtLoopEnd) { // Only request next frame if not paused
+                if (!isPausedAtLoopEnd) {
                     animationFrameId = requestAnimationFrame(scrollStep);
                 }
             };
@@ -135,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             animationFrameId = requestAnimationFrame(scrollStep);
 
             scrollIntervalId = setInterval(() => {
-                if (!isPausedAtLoopEnd && scrollIntervalId !== null) { // Only trigger if not paused and active
+                if (!isPausedAtLoopEnd && scrollIntervalId !== null) {
                     animationFrameId = requestAnimationFrame(scrollStep);
                 }
             }, scrollDelay);
