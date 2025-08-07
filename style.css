@@ -25,7 +25,7 @@ h1 {
 
 /* Updated for scrolling, hiding the scrollbar, and smooth behavior */
 #event-list-container {
-    max-height: 787px; /* Max height for the scrollable area */
+    max-height: auto; /* Max height for the scrollable area */
     overflow-y: auto; /* Add vertical scrollbar if content overflows */
     position: relative; /* Needed for scrolling manipulation */
     scroll-behavior: smooth; /* Added for smooth scrolling */
